@@ -24,16 +24,23 @@
 
 package com.giorgosneokleous.example.ttsspan.model
 
+import android.text.style.TtsSpan
+
 object DummyDataFactory {
+
     fun getListOfTTSItem(): List<TTSItem> = listOf(
-        TTSItem(0, "", ""),
-        TTSItem(1, "", ""),
-        TTSItem(2, "", ""),
-        TTSItem(3, "", ""),
-        TTSItem(4, "", ""),
-        TTSItem(5, "", ""),
-        TTSItem(6, "", ""),
-        TTSItem(7, "", ""),
-        TTSItem(8, "", "")
-    )
+        TTSItem("18/04/2020", "Date without TTSSpan", null),
+        TTSItem("18/04/2020", "Date with TtsSpan.DateBuilder", TtsSpan.TYPE_DATE),
+
+        TTSItem("5 meter", "Measure without TTSSpan", null),
+        TTSItem("5 meter", "Measure with TTSSpan", TtsSpan.TYPE_MEASURE),
+
+        TTSItem("14:00", "Time without TTSSpan", null),
+        TTSItem("14:00", "Time with TTSSpan", TtsSpan.TYPE_TIME),
+
+        TTSItem("admin:123456789", "Password without TTSSpan", null),
+        TTSItem("admin:123456789", "Password with TTSSpan", TtsSpan.TYPE_ELECTRONIC)
+    ).also { list ->
+        list.forEachIndexed { index, ttsItem -> ttsItem.id = index }
+    }
 }

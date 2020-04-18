@@ -36,46 +36,36 @@ import com.giorgosneokleous.example.ttsspan.R
 import com.giorgosneokleous.example.ttsspan.model.TTSItem
 import java.util.*
 
-class TTSRecyclerViewAdapter(
-    private val onItemClickListener: (position: Int, item: TTSItem) -> Unit
-) : ListAdapter<TTSItem, TTSRecyclerViewAdapter.TTSViewHolder>(DifftilCallback()) {
+class TTSRecyclerViewAdapter :
+    ListAdapter<TTSItem, TTSRecyclerViewAdapter.TTSViewHolder>(DiffUtilCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TTSViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.item_tts, parent, false)
 
-        return TTSViewHolder(view, ::onItemClicked)
+        return TTSViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: TTSViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    private fun onItemClicked(position: Int) {
-        val item = getItem(position)
-
-        onItemClickListener(position, item)
-    }
-
-    class TTSViewHolder(itemView: View, onViewHolderClicked: (Int) -> Unit) :
+    class TTSViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
         private val title = itemView.findViewById<TextView>(R.id.ttsItemTitle)
         private val subtitle = itemView.findViewById<TextView>(R.id.ttsItemSubtitle)
         private val id = itemView.findViewById<TextView>(R.id.ttsItemId)
 
-        init {
-            itemView.setOnClickListener { onViewHolderClicked(adapterPosition) }
-        }
-
         @SuppressLint("SetTextI18n")
         fun bind(item: TTSItem) {
-            title.text = item.title
+            title.clearComposingText()
+            title.text = item.toSpannable()
             subtitle.text = item.caption
             id.text = "ID: ${item.id}"
         }
     }
 
-    class DifftilCallback : DiffUtil.ItemCallback<TTSItem>() {
+    class DiffUtilCallback : DiffUtil.ItemCallback<TTSItem>() {
         override fun areItemsTheSame(oldItem: TTSItem, newItem: TTSItem): Boolean {
             return oldItem.id == newItem.id
         }

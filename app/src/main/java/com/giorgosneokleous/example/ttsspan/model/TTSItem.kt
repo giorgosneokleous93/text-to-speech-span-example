@@ -24,8 +24,70 @@
 
 package com.giorgosneokleous.example.ttsspan.model
 
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.TtsSpan
+import java.text.SimpleDateFormat
+import java.util.*
+
 data class TTSItem(
-    val id: Int,
     val title: String,
-    val caption: String
-)
+    val caption: String,
+    private val ttsSpanType: String?
+) {
+
+    var id: Int = 0
+
+    fun toSpannable(): SpannableString? {
+        val ttsSpanBuilder = when (ttsSpanType) {
+            TtsSpan.TYPE_DATE -> {
+                val calendar = Calendar.getInstance()
+                calendar.time = simpleDataFormat.parse(title)
+                    ?: throw IllegalStateException("Not expected null Date")
+
+                TtsSpan.DateBuilder()
+                    .setWeekday(calendar.get(Calendar.DAY_OF_WEEK))
+                    .setDay(calendar.get(Calendar.DAY_OF_MONTH))
+                    .setMonth(calendar.get(Calendar.MONTH))
+                    .setYear(calendar.get(Calendar.YEAR))
+            }
+            TtsSpan.TYPE_MEASURE -> {
+                val number = digitsPattern.find(title)?.value
+                val unit = stringPattern.find(title)?.value
+                TtsSpan.MeasureBuilder()
+                    .setNumber(number)
+                    .setUnit(unit)
+            }
+            TtsSpan.TYPE_TIME -> {
+                val hours = title.split(":")[0]
+                val minutes = title.split(":")[1]
+                TtsSpan.TimeBuilder()
+                    .setHours(hours.toInt())
+                    .setMinutes(minutes.toInt())
+            }
+            TtsSpan.TYPE_ELECTRONIC -> {
+                val username = title.split(":")[0]
+                val password = title.split(":")[1]
+                TtsSpan.ElectronicBuilder()
+                    .setPassword(password)
+                    .setUsername(username)
+
+            }
+            else -> null
+        }
+
+        val spannable = SpannableString(title)
+
+        ttsSpanBuilder?.let {
+            val ttsSpan = ttsSpanBuilder.build()
+            spannable.setSpan(ttsSpan, 0, title.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        return spannable
+    }
+}
+
+private val simpleDataFormat = SimpleDateFormat("dd/MM/yyyy", Locale.UK)
+private val digitsPattern = "\\d+".toRegex()
+private val stringPattern = "[a-zA-Z]+".toRegex()
+
