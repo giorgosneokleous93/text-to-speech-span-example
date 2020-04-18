@@ -25,11 +25,35 @@
 package com.giorgosneokleous.example.ttsspan
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.giorgosneokleous.example.ttsspan.list.TTSRecyclerViewAdapter
+import com.giorgosneokleous.example.ttsspan.model.DummyDataFactory
+import com.giorgosneokleous.example.ttsspan.model.TTSItem
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var ttsAdapter: TTSRecyclerViewAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        ttsAdapter = TTSRecyclerViewAdapter(::onItemClicked)
+
+        findViewById<RecyclerView>(R.id.ttsRecyclerView).apply {
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+            layoutManager = LinearLayoutManager(context)
+            adapter = ttsAdapter
+        }
+
+        ttsAdapter.submitList(DummyDataFactory.getListOfTTSItem())
+    }
+
+    private fun onItemClicked(position: Int, ttsItem: TTSItem) {
+        Toast.makeText(this, "Loading $position - ${ttsItem.caption}", Toast.LENGTH_LONG).show()
     }
 }
