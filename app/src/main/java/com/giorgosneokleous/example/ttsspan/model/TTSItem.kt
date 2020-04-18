@@ -38,6 +38,14 @@ data class TTSItem(
 
     var id: Int = 0
 
+    /**
+     * This method does a lot of shenanigans to determine predefined structured data specified
+     * at [DummyDataFactory].
+     *
+     * IRL: Determining dates, or time or measure should not occur using the following operations.
+     *
+     * They are just exhibiting the usage of some TTSSpans.
+     */
     fun toSpannable(): SpannableString? {
         val ttsSpanBuilder = when (ttsSpanType) {
             TtsSpan.TYPE_DATE -> {
