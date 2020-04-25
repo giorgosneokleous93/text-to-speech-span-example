@@ -26,6 +26,7 @@ package com.giorgosneokleous.example.ttsspan
 
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
+import android.speech.tts.Voice
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -35,6 +36,7 @@ import com.giorgosneokleous.example.ttsspan.list.TtsRecyclerViewAdapter
 import com.giorgosneokleous.example.ttsspan.listener.OnTtsItemClickListener
 import com.giorgosneokleous.example.ttsspan.model.DummyDataFactory
 import com.giorgosneokleous.example.ttsspan.model.TtsItem
+import java.util.*
 
 class MainActivity : AppCompatActivity(), OnTtsItemClickListener {
 
@@ -68,7 +70,7 @@ class MainActivity : AppCompatActivity(), OnTtsItemClickListener {
         Toast.makeText(this, "Item ${item.id} clicked", Toast.LENGTH_LONG).show()
         textToSpeech.speak(
             item.toSpannable(),
-            TextToSpeech.QUEUE_FLUSH,
+            TextToSpeech.QUEUE_ADD,
             null,
             "item_id_${item.id}"
         )
@@ -82,6 +84,15 @@ class MainActivity : AppCompatActivity(), OnTtsItemClickListener {
                 "Initialization of TextToSpeech has failed, please restart activity"
 
             Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+
+            textToSpeech.voice = Voice(
+                "custom_voice",
+                Locale.UK,
+                Voice.QUALITY_VERY_HIGH,
+                Voice.LATENCY_VERY_HIGH,
+                false,
+                mutableSetOf()
+            )
         }
     }
 }
