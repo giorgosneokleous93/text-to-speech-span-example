@@ -33,31 +33,44 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.giorgosneokleous.example.ttsspan.R
-import com.giorgosneokleous.example.ttsspan.model.TTSItem
+import com.giorgosneokleous.example.ttsspan.listener.OnTtsItemClickListener
+import com.giorgosneokleous.example.ttsspan.model.TtsItem
 import java.util.*
 
-class TTSRecyclerViewAdapter :
-    ListAdapter<TTSItem, TTSRecyclerViewAdapter.TTSViewHolder>(DiffUtilCallback()) {
+class TtsRecyclerViewAdapter(
+    private val onTtsItemClickListener: OnTtsItemClickListener
+) : ListAdapter<TtsItem, TtsRecyclerViewAdapter.TTSViewHolder>(DiffUtilCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TTSViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.item_tts, parent, false)
 
-        return TTSViewHolder(view)
+        return TTSViewHolder(view) { position ->
+            onTtsItemClickListener.onTtsItemClicked(getItem(position))
+        }
     }
 
     override fun onBindViewHolder(holder: TTSViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    class TTSViewHolder(itemView: View) :
-        RecyclerView.ViewHolder(itemView) {
+    class TTSViewHolder(
+        itemView: View,
+        callback: (position: Int) -> Unit
+    ) : RecyclerView.ViewHolder(itemView) {
+
         private val title = itemView.findViewById<TextView>(R.id.ttsItemTitle)
         private val subtitle = itemView.findViewById<TextView>(R.id.ttsItemSubtitle)
         private val id = itemView.findViewById<TextView>(R.id.ttsItemId)
 
+        init {
+            itemView.setOnClickListener {
+                callback(adapterPosition)
+            }
+        }
+
         @SuppressLint("SetTextI18n")
-        fun bind(item: TTSItem) {
+        fun bind(item: TtsItem) {
             title.clearComposingText()
             title.text = item.toSpannable()
             subtitle.text = item.caption
@@ -65,12 +78,12 @@ class TTSRecyclerViewAdapter :
         }
     }
 
-    class DiffUtilCallback : DiffUtil.ItemCallback<TTSItem>() {
-        override fun areItemsTheSame(oldItem: TTSItem, newItem: TTSItem): Boolean {
+    class DiffUtilCallback : DiffUtil.ItemCallback<TtsItem>() {
+        override fun areItemsTheSame(oldItem: TtsItem, newItem: TtsItem): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: TTSItem, newItem: TTSItem): Boolean {
+        override fun areContentsTheSame(oldItem: TtsItem, newItem: TtsItem): Boolean {
             return Objects.deepEquals(oldItem, newItem)
         }
 

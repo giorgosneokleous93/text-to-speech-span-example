@@ -30,7 +30,7 @@ import android.text.style.TtsSpan
 import java.text.SimpleDateFormat
 import java.util.*
 
-data class TTSItem(
+data class TtsItem(
     val title: String,
     val caption: String,
     private val ttsSpanType: String?

@@ -25,22 +25,29 @@
 package com.giorgosneokleous.example.ttsspan
 
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.giorgosneokleous.example.ttsspan.list.TTSRecyclerViewAdapter
+import com.giorgosneokleous.example.ttsspan.list.TtsRecyclerViewAdapter
+import com.giorgosneokleous.example.ttsspan.listener.OnTtsItemClickListener
 import com.giorgosneokleous.example.ttsspan.model.DummyDataFactory
+import com.giorgosneokleous.example.ttsspan.model.TtsItem
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnTtsItemClickListener {
 
-    private lateinit var ttsAdapter: TTSRecyclerViewAdapter
+    private lateinit var ttsAdapter: TtsRecyclerViewAdapter
+    private lateinit var textToSpeech: TextToSpeech
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        ttsAdapter = TTSRecyclerViewAdapter()
+        setupTextToSpeech()
+
+        ttsAdapter = TtsRecyclerViewAdapter(this)
 
         findViewById<RecyclerView>(R.id.ttsRecyclerView).apply {
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
@@ -49,5 +56,32 @@ class MainActivity : AppCompatActivity() {
         }
 
         ttsAdapter.submitList(DummyDataFactory.getListOfTTSItem())
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        textToSpeech.shutdown()
+    }
+
+    override fun onTtsItemClicked(item: TtsItem) {
+        Toast.makeText(this, "Item ${item.id} clicked", Toast.LENGTH_LONG).show()
+        textToSpeech.speak(
+            item.toSpannable(),
+            TextToSpeech.QUEUE_FLUSH,
+            null,
+            "item_id_${item.id}"
+        )
+    }
+
+    private fun setupTextToSpeech() {
+        textToSpeech = TextToSpeech(this) { status ->
+            val message = if (status == TextToSpeech.SUCCESS)
+                "Initialization of TextToSpeech was successful"
+            else
+                "Initialization of TextToSpeech has failed, please restart activity"
+
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        }
     }
 }
